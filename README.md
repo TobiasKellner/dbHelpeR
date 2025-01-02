@@ -7,10 +7,10 @@ An R package for working with relational databases
 
 ## Features
 
-- Table comments: query, set and delete table comments
-- Column comments: query, set and delete column comments
-- Primary keys
-- Schemas
+- **Table comments**: query, set and delete table comments
+- **Column comments**: query, set and delete column comments
+- **Primary keys**: query, set and delete primary keys
+- **Schemas**: query, create and delete schemas
 
 ## Supported Databases
 
