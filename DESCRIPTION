@@ -2,7 +2,7 @@ Package: dbHelpeR
 Title: An R package for working with relational databases
 Version: 0.0.0.9000
 Authors@R: 
-    person("Tobias", "Kellner", role = c("aut", "cre"),
+    person("Tobias", "Kellner", email = "tobias.kellner@transdev.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9946-2333"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
