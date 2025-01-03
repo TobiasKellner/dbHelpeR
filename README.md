@@ -11,8 +11,8 @@ An R package for working with relational databases
 - **Column comments**: query, create and delete column comments
 - **Primary keys**: query, create and delete primary keys
 - **Schemas**: query, create and delete schemas
-- **User Information**: retrieve user specific information e.g. user name or user privileges
-- 
+- **User information**: retrieve user specific information e.g. user name or user privileges
+- **Database information**: retrieve database specific information e.g. database name or database type
 
 ## Supported Database Types
 
