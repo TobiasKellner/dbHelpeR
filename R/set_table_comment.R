@@ -1,4 +1,16 @@
-set_table_comment <- function(con, schema, table_name, comment) {
+#' Create a comment for a database table
+#'
+#' @param conn A DBIConnection object
+#' @param schema The name of the parent schema of the table
+#' @param table_name The name of the database table
+#' @param comment The comment you want to use for this table
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+set_table_comment <- function(conn, schema, table_name, comment) {
   # detect database type
   db_type <- get_db_type(con)
   db_type <- tolower(db_type)
