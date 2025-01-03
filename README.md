@@ -39,3 +39,7 @@ library(dbHelpeR)
 
 # Connect to your database
 ```
+
+## 📄 License
+
+SQLHelper is released under the MIT License, ensuring that it remains free and open for everyone to use. See the [LICENSE](LICENSE) file for more details.
