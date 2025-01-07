@@ -37,6 +37,7 @@ devtools::install_github("TobiasKellner/dbHelpeR")
 
 ```r
 library(dbHelpeR)
+library(DBI)
 
 # Connect to your database
 ```
