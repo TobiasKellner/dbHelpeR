@@ -2,7 +2,7 @@
 
 An R package for working with relational databases
 
-`dbHelpeR` is an R package designed to simplify and streamline interactions with SQL databases. It provides high-level functions for managing database metadata, schemas, and other common administrative tasks. Whether you’re a data scientist, database administrator, or analyst, `dbHelpeR` bridges the gap between R and SQL, empowering you to manage and interact with databases effortlessly.
+`dbHelpeR` is an R package designed to simplify and streamline interactions with SQL databases. It provides high-level functions for managing database metadata, schemas, constraints, and other common administrative tasks. Whether you’re a data scientist, database administrator, or analyst, `dbHelpeR` bridges the gap between R and SQL, empowering you to manage and interact with databases effortlessly.
 
 
 ## Features
