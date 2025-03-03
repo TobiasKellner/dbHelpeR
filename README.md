@@ -1,4 +1,5 @@
-# dbHelpeR
+# dbHelpeR  <img src="inst/figures/logo.png" width="240px" align="right" />
+
 
 An R package for working with relational databases
 
