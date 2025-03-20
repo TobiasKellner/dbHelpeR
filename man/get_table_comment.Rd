@@ -19,7 +19,7 @@ If no schema is specified, the default schema of the database is used
 A character string representing the table comment.
 }
 \description{
-This function the comment of the selected database table.
+This function returns the comment of the selected database table.
 }
 \examples{
 get_table_comment(conn = con, schema = "schema", table = "table")

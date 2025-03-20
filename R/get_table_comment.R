@@ -1,6 +1,6 @@
 #' Get table comment
 #'
-#' This function the comment of the selected database table.
+#' This function returns the comment of the selected database table.
 #'
 #' @param conn A DBIConnection object.
 #' @param schema The name of the parent schema of the database table.
