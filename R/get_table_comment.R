@@ -1,8 +1,22 @@
-library(DBI)
+#' Get table comment
+#'
+#' This function the comment of the selected database table.
+#'
+#' @param conn A DBIConnection object.
+#' @param schema The name of the parent schema of the database table.
+#'  If no schema is specified, the default schema of the database is used
+#'  (e.g. 'dbo' for Microsoft SQL Server).
+#' @param table The name of the database table.
+#'
+#' @return A character string representing the table comment.
+#' @export
+#'
+#' @examples
+#' get_table_comment(conn = con, schema = "schema", table = "table")
+#'
+get_table_comment <- function(con, schema, table) {
 
-# Funktion zum Abrufen des Tabellenkommentars
-get_table_comment <- function(con, schema, table_name) {
-  # Datenbanktyp automatisch erkennen
+  # detect database type
   db_type <- get_db_type(con)
   db_type <- tolower(db_type)
 
@@ -11,10 +25,10 @@ get_table_comment <- function(con, schema, table_name) {
   } else if (grepl("postgresql", db_type)) {
     db_type <- "postgres"
   } else {
-    stop("Datenbanktyp wird nicht unterstützt. Unterstützte Typen: MSSQL, PostgreSQL.")
+    stop("Database type is not supported. Supported types are: Microsoft SQL Server, PostgreSQL.")
   }
 
-  # Query basierend auf dem Datenbanktyp erstellen
+  # Create query based on the database type
   query <- switch(
     db_type,
     "mssql" = paste0(
@@ -23,7 +37,7 @@ get_table_comment <- function(con, schema, table_name) {
       "INNER JOIN sys.schemas s ON t.schema_id = s.schema_id\n",
       "LEFT JOIN sys.extended_properties ep\n",
       "  ON t.object_id = ep.major_id AND ep.minor_id = 0 AND ep.name = 'MS_Description'\n",
-      "WHERE s.name = '", schema, "' AND t.name = '", table_name, "';"
+      "WHERE s.name = '", schema, "' AND t.name = '", table, "';"
     ),
     "postgres" = paste0(
       "SELECT
@@ -33,26 +47,19 @@ get_table_comment <- function(con, schema, table_name) {
       JOIN pg_namespace n ON c.relnamespace = n.oid
       LEFT JOIN pg_description d ON c.oid = d.objoid
       WHERE
-      c.relname = '",table_name, "' -- Name der Tabelle
+      c.relname = '",table, "' -- Name der Tabelle
       AND n.nspname = '", schema, "'; -- Name des Schemas
       "
     )
   )
 
-  # Query ausführen und Ergebnis zurückgeben
+  # Execute query and return result
   result <- dbGetQuery(con, query)
   if (nrow(result) > 0) {
     return(result$table_comment[1])
   } else {
-    warning("Kein Kommentar für die angegebene Tabelle gefunden.")
+    warning("No comment found for the specified table.")
     return(NA)
   }
-}
 
-# Beispielaufruf:
-# Verbindung zu einer MSSQL- oder PostgreSQL-Datenbank herstellen
-# library(odbc)
-# con <- dbConnect(odbc::odbc(), dsn = "Deine_DSN")
-# Kommentar abrufen
-# mssql_comment <- table_comment(con, "dbo", "deine_tabelle")
-# postgres_comment <- table_comment(con, "public", "deine_tabelle")
+}
