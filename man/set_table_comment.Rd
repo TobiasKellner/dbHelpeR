@@ -4,7 +4,7 @@
 \alias{set_table_comment}
 \title{Create a comment for a database table}
 \usage{
-set_table_comment(conn, schema, table, comment)
+set_table_comment(conn, schema = NULL, table, comment)
 }
 \arguments{
 \item{conn}{A DBIConnection object}
