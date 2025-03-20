@@ -1,6 +1,24 @@
-get_column_comment <- function(con, schema = NULL, table_name, column_name) {
+#' Get column comment
+#'
+#' This function returns the column comment of a database table.
+#'
+#' @param conn A DBIConnection object.
+#' @param schema The name of the parent schema of the database table.
+#'  If no schema is specified, the default schema of the database is used
+#'  (e.g. 'dbo' for Microsoft SQL Server).
+#' @param table The name of the database table.
+#' @param column The column name
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' get_column_comment(conn = con, schema = "schema", table = "table", column = "column")
+#'
+get_column_comment <- function(conn, schema = NULL, table, column) {
+
   # detect database type
-  db_type <- get_db_type(con)
+  db_type <- get_database_type(con)
   db_type <- tolower(db_type)
 
   if (grepl("sql server", db_type)) {
@@ -8,44 +26,38 @@ get_column_comment <- function(con, schema = NULL, table_name, column_name) {
   } else if (grepl("postgresql", db_type)) {
     db_type <- "postgres"
   } else {
-    stop("Datenbanktyp wird nicht unterstützt. Unterstützte Typen: MSSQL, PostgreSQL.")
+    stop("Database type is not supported. Supported types are: Microsoft SQL Server, PostgreSQL.")
   }
 
-  # Handle schema prefix if provided
-  schema_prefix <- if (!is.null(schema)) paste0(schema, ".") else ""
+  # handle schema prefix if provided
+  schema_prefix <- if (!is.null(schema)) schema else "public"
 
-  # Define a switch for supported database types
+  # define a switch for supported database types
   query <- switch(
     db_type,
     "postgres" = paste0(
-
-      "select
-      c.table_schema,
-      c.table_name,
-      c.column_name,
-      pgd.description
-      from pg_catalog.pg_statio_all_tables as st
-      inner join pg_catalog.pg_description pgd on (pgd.objoid = st.relid)
-      inner join information_schema.columns c on (
-        pgd.objsubid   = c.ordinal_position and
-        c.table_schema = st.schemaname and
-        c.table_name   = st.relname
-      )
-      WHERE c.table_schema = '", schema, "'
-      AND c.table_name = '", table_name, "'
-      AND c.column_name = '", column_name, "';
+      "SELECT d.description AS description
+      FROM pg_catalog.pg_attribute a
+      JOIN pg_catalog.pg_class c ON a.attrelid = c.oid
+      JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid
+      LEFT JOIN pg_catalog.pg_description d ON a.attrelid = d.objoid AND a.attnum = d.objsubid
+      WHERE n.nspname = '", schema_prefix, "'
+      AND c.relname = '", table, "'
+      AND a.attname = '", column, "';
       "
-
-      # "SELECT col_description((SELECT oid FROM pg_class WHERE relname = '", table_name, "'), ",
-      # "(SELECT attnum FROM pg_attribute WHERE attname = '", column_name, "' AND attrelid = (SELECT oid FROM pg_class WHERE relname = '", table_name, "')));"
-
       )
     ,
     "mssql" = paste0(
-      "SELECT value FROM sys.extended_properties ",
-      "WHERE name = 'MS_Description' AND ",
-      "major_id = OBJECT_ID('", ifelse(is.null(schema), table_name, paste0(schema, ".", table_name)), "') AND ",
-      "minor_id = (SELECT column_id FROM sys.columns WHERE name = '", column_name, "' AND object_id = OBJECT_ID('", ifelse(is.null(schema), table_name, paste0(schema, ".", table_name)), "'));")
+      "SELECT ep.value AS description
+      FROM sys.extended_properties ep
+      JOIN sys.columns c ON ep.major_id = c.object_id AND ep.minor_id = c.column_id
+      JOIN sys.tables t ON c.object_id = t.object_id
+      JOIN sys.schemas s ON t.schema_id = s.schema_id
+      WHERE ep.name = 'MS_Description'
+      AND s.name = '", ifelse(is.null(schema), "dbo", schema), "'
+      AND t.name = '", table, "'
+      AND c.name = '", column, "';
+      ")
     ,
     stop("Unsupported database type: ", db_type)
   )
@@ -54,7 +66,8 @@ get_column_comment <- function(con, schema = NULL, table_name, column_name) {
   if (nrow(result) > 0) {
     return(result$description[1])
   } else {
-    warning("Kein Kommentar für die angegebene Tabelle gefunden.")
+    warning("No comment found for the specified table column.")
     return(NA)
   }
+
 }
