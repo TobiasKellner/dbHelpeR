@@ -14,7 +14,7 @@
 #' @examples
 #' get_table_comment(conn = con, schema = "schema", table = "table")
 #'
-get_table_comment <- function(con, schema, table) {
+get_table_comment <- function(con, schema = NULL, table) {
 
   # detect database type
   db_type <- get_database_type(con)
@@ -28,7 +28,7 @@ get_table_comment <- function(con, schema, table) {
     stop("Database type is not supported. Supported types are: Microsoft SQL Server, PostgreSQL.")
   }
 
-  # Create query based on the database type
+  # create query based on the database type
   query <- switch(
     db_type,
     "mssql" = paste0(
@@ -36,8 +36,10 @@ get_table_comment <- function(con, schema, table) {
       "FROM sys.tables t\n",
       "INNER JOIN sys.schemas s ON t.schema_id = s.schema_id\n",
       "LEFT JOIN sys.extended_properties ep\n",
-      "  ON t.object_id = ep.major_id AND ep.minor_id = 0 AND ep.name = 'MS_Description'\n",
-      "WHERE s.name = '", schema, "' AND t.name = '", table, "';"
+      "ON t.object_id = ep.major_id AND ep.minor_id = 0 AND ep.name = 'MS_Description'\n",
+      "WHERE t.name = '", table, "' ",
+      if(!is.null(schema)) {paste0("AND s.name = '", schema, "'")},
+      ";"
     ),
     "postgres" = paste0(
       "SELECT
@@ -47,13 +49,13 @@ get_table_comment <- function(con, schema, table) {
       JOIN pg_namespace n ON c.relnamespace = n.oid
       LEFT JOIN pg_description d ON c.oid = d.objoid
       WHERE
-      c.relname = '",table, "' -- Name der Tabelle
-      AND n.nspname = '", schema, "'; -- Name des Schemas
-      "
+      c.relname = '",table, "'",
+      if(!is.null(schema)) {paste0("AND n.nspname = '", schema, "'")},
+      ";"
     )
   )
 
-  # Execute query and return result
+  # execute query and return result
   result <- dbGetQuery(con, query)
   if (nrow(result) > 0) {
     return(result$table_comment[1])
