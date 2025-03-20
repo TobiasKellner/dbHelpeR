@@ -4,7 +4,7 @@
 \alias{get_table_comment}
 \title{Get table comment}
 \usage{
-get_table_comment(con, schema, table)
+get_table_comment(con, schema = NULL, table)
 }
 \arguments{
 \item{schema}{The name of the parent schema of the database table.
