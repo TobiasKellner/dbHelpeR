@@ -17,7 +17,7 @@
 get_table_comment <- function(con, schema, table) {
 
   # detect database type
-  db_type <- get_db_type(con)
+  db_type <- get_database_type(con)
   db_type <- tolower(db_type)
 
   if (grepl("sql server", db_type)) {
