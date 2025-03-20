@@ -12,7 +12,7 @@
 #'
 #' @examples set_table_comment(conn = con, schema = "test_schema", table = "test_table", comment = "This is my test comment.")
 #'
-set_table_comment <- function(conn, schema, table, comment) {
+set_table_comment <- function(conn, schema = NULL, table, comment) {
 
   # detect database type
   db_type <- get_database_type(con)
@@ -26,22 +26,25 @@ set_table_comment <- function(conn, schema, table, comment) {
     stop("Database type is not supported. Supported types are: Microsoft SQL Server, PostgreSQL.")
   }
 
+  # Handle schema prefix if provided
+  schema_prefix <- if (!is.null(schema)) paste0(schema, ".") else ""
+
   # Create query based on the database type
-  query <- switch(
+  sql_command <- switch(
     db_type,
     "postgres" = paste0(
-      "COMMENT ON TABLE ", schema, ".\"", table, "\" IS '", comment, "';"
+      "COMMENT ON TABLE ", schema_prefix, "\"", table, "\" IS '", comment, "';"
     ),
     "mssql" = paste0(
       "EXEC sp_addextendedproperty \n",
       "  @name = 'MS_Description',\n",
       "  @value = '", comment, "',\n",
-      "  @level0type = 'SCHEMA', @level0name = '", schema, "',\n",
+      "  @level0type = 'SCHEMA', @level0name = '", ifelse(is.null(schema), "dbo", schema), "',\n",
       "  @level1type = 'TABLE', @level1name = '", table, "';"
     )
   )
 
-  # execute SQL statement
-  dbExecute(con, query)
+  # execute SQLcommand
+  dbExecute(con, sql_command)
 
 }
