@@ -29,7 +29,7 @@ get_table_comment <- function(con, schema = NULL, table) {
   }
 
   # create query based on the database type
-  query <- switch(
+  sql_command <- switch(
     db_type,
     "mssql" = paste0(
       "SELECT ep.value AS table_comment\n",
@@ -56,7 +56,7 @@ get_table_comment <- function(con, schema = NULL, table) {
   )
 
   # execute query and return result
-  result <- dbGetQuery(con, query)
+  result <- dbGetQuery(con, sql_command)
   if (nrow(result) > 0) {
     return(result$table_comment[1])
   } else {
