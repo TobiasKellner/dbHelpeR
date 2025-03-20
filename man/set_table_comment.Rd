@@ -16,9 +16,9 @@ set_table_comment(conn, schema, table, comment)
 \item{comment}{The comment you want to use for this table}
 }
 \description{
-This function ...
+This function sets a comment for the selected database table.
 }
 \examples{
-set_table_comment(conn = con, schema = "test_schema", table = "test_table", comment = "This ist my test comment.")
+set_table_comment(conn = con, schema = "test_schema", table = "test_table", comment = "This is my test comment.")
 
 }
