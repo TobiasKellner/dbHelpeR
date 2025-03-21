@@ -1,53 +1,58 @@
-library(DBI)
-
+#' Get permissions of database user
+#'
+#' This function returns the permissions of the database user.
+#'
+#' @param conn A DBIConnection object.
+#'
+#' @return A character vector representing the permissions of the database user.
+#' @export
+#'
+#' @examples
+#' get_user_permissions(conn = con)
+#'
 get_user_permissions <- function(conn) {
-  # Sicherstellen, dass es sich um eine DBI-Verbindung handelt
+
   if (!inherits(conn, "DBIConnection")) {
-    stop("Das Argument ist keine gültige DBI-Datenbankverbindung.")
+    stop("The argument is not a valid DBI database connection.")
   }
 
-  # Datenbanktyp bestimmen
-  db_type <- get_db_type(conn)
+  # detect database type
+  db_type <- get_database_type(conn)
+  db_type <- tolower(db_type)
 
-  # Rechte prüfen basierend auf dem Datenbanktyp
+  if (grepl("sql server", db_type)) {
+    db_type <- "mssql"
+  } else if (grepl("postgresql", db_type)) {
+    db_type <- "postgres"
+  } else {
+    stop("Database type is not supported. Supported types are: Microsoft SQL Server, PostgreSQL.")
+  }
+
+  # check rights based on the database type
   tryCatch({
-    query <- NULL
+    sql_command <- NULL
 
-    if (db_type == "PostgreSQL") {
-      # PostgreSQL: Überprüfe die Rollen- und Tabellenberechtigungen
-      query <- "SELECT DISTINCT privilege_type
+    if (db_type == "postgres") {
+      sql_command <- "SELECT DISTINCT privilege_type
                 FROM information_schema.role_table_grants
                 WHERE grantee = CURRENT_USER;"
-    } else if (db_type == "MySQL" || db_type == "MariaDB") {
-      # MySQL/MariaDB: Rechte aus der user_privileges Tabelle
-      query <- "SELECT DISTINCT privilege_type
-                FROM information_schema.user_privileges
-                WHERE grantee = CURRENT_USER();"
-    } else if (db_type == "SQLite") {
-      # SQLite: Da es keine granularen Rechte gibt, vereinfachen wir
-      return(c("read_write")) # Alle SQLite-Nutzer haben in der Regel vollständige Rechte
-    } else if (db_type == "MS SQL Server") {
-      # MS SQL Server: Rechte aus sys.database_permissions
-      query <- "SELECT DISTINCT dp.permission_name
+    } else if (db_type == "sql server") {
+      sql_command <- "SELECT DISTINCT dp.permission_name
                 FROM sys.database_permissions dp
                 WHERE USER_NAME(dp.grantee_principal_id) = USER_NAME();"
-    } else if (db_type == "Oracle") {
-      # Oracle: Rechte aus USER_TAB_PRIVS
-      query <- "SELECT DISTINCT privilege
-                FROM user_tab_privs
-                WHERE grantee = USER"
     } else {
-      stop("Rechteprüfung für diese Datenbank wird nicht unterstützt.")
+      stop("Permission check for this database type is not supported.")
     }
 
-    # Query ausführen
-    result <- dbGetQuery(conn, query)
+    # execute query
+    result <- dbGetQuery(conn, sql_command)
 
-    # Ergebnis in einen Vektor umwandeln und zurückgeben
+    # convert result into a vector and return it
     return(unique(as.character(result[[1]])))
 
   }, error = function(e) {
-    warning("Fehler beim Abrufen der Nutzerrechte: ", e$message)
-    return(character(0)) # Leerer Vektor bei Fehler
+    warning("Error retrieving user rights: ", e$message)
+    return(character(0))
   })
+
 }
