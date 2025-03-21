@@ -4,16 +4,16 @@
 \alias{drop_table_comment}
 \title{Drop table comment}
 \usage{
-drop_table_comment(con, schema = NULL, table)
+drop_table_comment(conn, schema = NULL, table)
 }
 \arguments{
+\item{conn}{A DBIConnection object.}
+
 \item{schema}{The name of the parent schema of the database table.
 If no schema is specified, the default schema of the database is used
 (e.g. 'dbo' for Microsoft SQL Server).}
 
 \item{table}{The name of the database table.}
-
-\item{conn}{A DBIConnection object.}
 }
 \description{
 This function deletes the existing comment of the selected database table.
