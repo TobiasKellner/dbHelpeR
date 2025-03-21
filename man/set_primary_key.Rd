@@ -19,7 +19,7 @@ If no schema is specified, the default schema of the database is used
 
 \item{pk_name}{The optional name of the primary key. If no name is specified,
 the primary key name is generated as follows: \cr
-\code{pk_name <- paste0(table, "_pk")}}
+\code{pk_name <- paste0("PK_", table)}}
 }
 \description{
 This function sets a primary key for a selected database table. \cr
