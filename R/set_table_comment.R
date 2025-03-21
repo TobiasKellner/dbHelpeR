@@ -15,7 +15,7 @@
 set_table_comment <- function(conn, schema = NULL, table, comment) {
 
   # detect database type
-  db_type <- get_database_type(con)
+  db_type <- get_database_type(conn)
   db_type <- tolower(db_type)
 
   if (grepl("sql server", db_type)) {
@@ -45,6 +45,6 @@ set_table_comment <- function(conn, schema = NULL, table, comment) {
   )
 
   # execute SQLcommand
-  dbExecute(con, sql_command)
+  dbExecute(conn, sql_command)
 
 }
