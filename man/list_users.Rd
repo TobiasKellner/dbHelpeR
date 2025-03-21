@@ -9,6 +9,13 @@ list_users(conn)
 \arguments{
 \item{conn}{A DBIConnection object.}
 }
+\value{
+A character vector representing the users who have access to the database.
+}
 \description{
 This function lists all database users and returns them as a dataframe object.
+}
+\examples{
+list_users(conn = con)
+
 }
