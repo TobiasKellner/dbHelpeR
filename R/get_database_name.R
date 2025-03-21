@@ -13,7 +13,7 @@
 get_database_name <- function(conn) {
 
   # detect database type
-  db_type <- get_database_type(con)
+  db_type <- get_database_type(conn)
   db_type <- tolower(db_type)
 
   if (grepl("sql server", db_type)) {
@@ -32,7 +32,7 @@ get_database_name <- function(conn) {
     stop("Unsupported database type: ", db_type)
   )
 
-  result <- dbGetQuery(con, query)
+  result <- dbGetQuery(conn, query)
 
   return(result[[1, 1]])
 
