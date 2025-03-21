@@ -13,7 +13,7 @@ set_table_comment(conn, schema = NULL, table, comment)
 
 \item{table}{The name of the database table}
 
-\item{comment}{The comment you want to use for this table}
+\item{comment}{The comment you want to set for this table}
 }
 \description{
 This function sets a comment for the selected database table.
