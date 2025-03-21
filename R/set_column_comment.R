@@ -19,7 +19,7 @@
 set_column_comment <- function(conn, schema = NULL, table, column, comment) {
 
   # detect database type
-  db_type <- get_database_type(con)
+  db_type <- get_database_type(conn)
   db_type <- tolower(db_type)
 
   if (grepl("sql server", db_type)) {
@@ -30,10 +30,10 @@ set_column_comment <- function(conn, schema = NULL, table, column, comment) {
     stop("Database type is not supported. Supported types are: Microsoft SQL Server, PostgreSQL.")
   }
 
-  # Handle schema prefix if provided
+  # handle schema prefix if provided
   schema_prefix <- if (!is.null(schema)) paste0(schema, ".") else ""
 
-  # Define a switch for supported database types
+  # define a switch for supported database types
   sql_command <- switch(
     db_type,
     "postgres" = paste0(
