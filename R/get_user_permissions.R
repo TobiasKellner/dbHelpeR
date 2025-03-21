@@ -36,7 +36,7 @@ get_user_permissions <- function(conn) {
       sql_command <- "SELECT DISTINCT privilege_type
                 FROM information_schema.role_table_grants
                 WHERE grantee = CURRENT_USER;"
-    } else if (db_type == "sql server") {
+    } else if (db_type == "mssql") {
       sql_command <- "SELECT DISTINCT dp.permission_name
                 FROM sys.database_permissions dp
                 WHERE USER_NAME(dp.grantee_principal_id) = USER_NAME();"
