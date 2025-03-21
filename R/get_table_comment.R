@@ -14,10 +14,10 @@
 #' @examples
 #' get_table_comment(conn = con, schema = "schema", table = "table")
 #'
-get_table_comment <- function(con, schema = NULL, table) {
+get_table_comment <- function(conn, schema = NULL, table) {
 
   # detect database type
-  db_type <- get_database_type(con)
+  db_type <- get_database_type(conn)
   db_type <- tolower(db_type)
 
   if (grepl("sql server", db_type)) {
@@ -56,7 +56,7 @@ get_table_comment <- function(con, schema = NULL, table) {
   )
 
   # execute query and return result
-  result <- dbGetQuery(con, sql_command)
+  result <- dbGetQuery(conn, sql_command)
   if (nrow(result) > 0) {
     return(result$table_comment[1])
   } else {
