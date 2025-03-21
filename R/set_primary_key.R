@@ -12,7 +12,7 @@
 #' @param columns Character vector. The column(s) to set as the primary key.
 #' @param pk_name The optional name of the primary key. If no name is specified,
 #'  the primary key name is generated as follows: \cr
-#'  \code{pk_name <- paste0(table, "_pk")}
+#'  \code{pk_name <- paste0("PK_", table)}
 #'
 #' @return
 #' @export
@@ -33,22 +33,22 @@ set_primary_key <- function(conn, schema = NULL, table, columns, pk_name = NULL)
     stop("Database type is not supported. Supported types are: Microsoft SQL Server, PostgreSQL.")
   }
 
-  # Validate input
+  # validate input
   if (length(columns) < 1) {
     stop("At least one column must be specified for the primary key.")
   }
 
-  # Handle schema prefix if provided
+  # handle schema prefix if provided
   schema_prefix <- if (!is.null(schema)) paste0(schema, ".") else ""
 
-  # Define name of primary key
-  pk_name <- ifelse(is.null(pk_name), paste0(table, "_pk"), pk_name)
+  # define name of primary key
+  pk_name <- ifelse(is.null(pk_name), paste0("PK_", table), pk_name)
 
-  # Join columns with commas for composite primary keys
+  # join columns with commas for composite primary keys
   columns_list <- paste(columns, collapse = ", ")
   columns_list_postgres <- paste(shQuote(columns, type = "cmd"), collapse = ", ")
 
-  # Define a switch for supported database types
+  # define a switch for supported database types
   sql_command <- switch(
     db_type,
     "postgres" = paste0(
@@ -63,9 +63,9 @@ set_primary_key <- function(conn, schema = NULL, table, columns, pk_name = NULL)
   )
 
   # execute SQLcommand
-  dbExecute(con, sql_command)
+  dbExecute(conn, sql_command)
 
-  # Message about successful setting of the primary key
+  # message about successful setting of the primary key
   cat(
     "Primary key ", "\"", pk_name, "\"" ," successfully set on table '",
     schema_prefix, table,
