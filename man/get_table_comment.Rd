@@ -4,16 +4,16 @@
 \alias{get_table_comment}
 \title{Get table comment}
 \usage{
-get_table_comment(con, schema = NULL, table)
+get_table_comment(conn, schema = NULL, table)
 }
 \arguments{
+\item{conn}{A DBIConnection object.}
+
 \item{schema}{The name of the parent schema of the database table.
 If no schema is specified, the default schema of the database is used
 (e.g. 'dbo' for Microsoft SQL Server).}
 
 \item{table}{The name of the database table.}
-
-\item{conn}{A DBIConnection object.}
 }
 \value{
 A character string representing the table comment.
