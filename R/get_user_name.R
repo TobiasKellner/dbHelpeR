@@ -5,7 +5,7 @@ get_user_name <- function(conn) {
   }
 
   # Datenbanktyp bestimmen
-  db_type <- get_db_type(conn)
+  db_type <- get_database_type(conn)
 
   # Nutzername abrufen basierend auf dem Datenbanktyp
   tryCatch({
