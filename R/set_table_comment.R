@@ -5,7 +5,7 @@
 #' @param conn A DBIConnection object
 #' @param schema The name of the parent schema of the database table
 #' @param table The name of the database table
-#' @param comment The comment you want to use for this table
+#' @param comment The comment you want to set for this table
 #'
 #' @return
 #' @export
