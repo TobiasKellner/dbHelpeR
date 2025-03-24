@@ -4,7 +4,13 @@
 \alias{get_column_comment}
 \title{Get column comment}
 \usage{
-get_column_comment(conn, schema = NULL, table, column)
+get_column_comment(
+  conn,
+  schema = NULL,
+  table,
+  column = NULL,
+  dataframe = FALSE
+)
 }
 \arguments{
 \item{conn}{A DBIConnection object.}

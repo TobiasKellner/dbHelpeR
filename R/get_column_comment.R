@@ -15,7 +15,7 @@
 #' @examples
 #' get_column_comment(conn = con, schema = "schema", table = "table", column = "column")
 #'
-get_column_comment <- function(conn, schema = NULL, table, column) {
+get_column_comment <- function(conn, schema = NULL, table, column = NULL, dataframe = FALSE) {
 
   # detect database type
   db_type <- get_database_type(con)
@@ -33,41 +33,44 @@ get_column_comment <- function(conn, schema = NULL, table, column) {
   schema_prefix <- if (!is.null(schema)) schema else "public"
 
   # define a switch for supported database types
-  query <- switch(
+  sql_command <- switch(
     db_type,
     "postgres" = paste0(
-      "SELECT d.description AS description
+      "SELECT n.nspname as column_name, d.description AS description
       FROM pg_catalog.pg_attribute a
       JOIN pg_catalog.pg_class c ON a.attrelid = c.oid
       JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid
       LEFT JOIN pg_catalog.pg_description d ON a.attrelid = d.objoid AND a.attnum = d.objsubid
       WHERE n.nspname = '", schema_prefix, "'
-      AND c.relname = '", table, "'
-      AND a.attname = '", column, "';
-      "
-      )
-    ,
+      AND c.relname = '", table,
+      if(!is.null(column)) {paste0("' AND column_name = '", column)},
+      "';"
+      ),
     "mssql" = paste0(
-      "SELECT ep.value AS description
+      "SELECT c.name AS column_name, ep.value AS description
       FROM sys.extended_properties ep
       JOIN sys.columns c ON ep.major_id = c.object_id AND ep.minor_id = c.column_id
       JOIN sys.tables t ON c.object_id = t.object_id
       JOIN sys.schemas s ON t.schema_id = s.schema_id
       WHERE ep.name = 'MS_Description'
       AND s.name = '", ifelse(is.null(schema), "dbo", schema), "'
-      AND t.name = '", table, "'
-      AND c.name = '", column, "';
-      ")
+      AND t.name = '", table,
+      if(!is.null(column)) {paste0("' AND COLUMN_NAME = '", column)},
+      "';"
+      )
     ,
     stop("Unsupported database type: ", db_type)
   )
 
-  result <- dbGetQuery(con, query)
-  if (nrow(result) > 0) {
-    return(result$description[1])
+  # execute SQLcommand
+  result <- dbGetQuery(con, sql_command)
+
+  if(dataframe == FALSE) {
+    return(result[[1, 2]])
+  } else if(dataframe == TRUE) {
+    return(result)
   } else {
-    warning("No comment found for the specified table column.")
-    return(NA)
+    stop("Incorrect input in the 'dataframe' option")
   }
 
 }
